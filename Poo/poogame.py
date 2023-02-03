@@ -34,6 +34,7 @@ class PooGame:
             self._check_events()
             self.toilet.update()
             self._update_bullets()
+            self._update_poos()
             self._update_screen()
             self.clock.tick(60)
 
@@ -98,6 +99,19 @@ class PooGame:
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
 
+        self._check_bullet_poo_collisions()
+
+    def _check_bullet_poo_collisions(self):
+        """Respond to bullet-alien collisions."""
+        # Remove any bullets and aliens that have collided.
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.poos, True, True)
+
+        if not self.poos:
+            # Destroy existing bullets and create new fleet.
+            self.bullets.empty()
+            self._create_fleet()
+
     def _create_poo(self, x_position, y_position):
         """Create an alien and place it in the row."""
         new_poo = Poo(self)
@@ -107,10 +121,10 @@ class PooGame:
         self.poos.add(new_poo)
 
     def _poo_army(self):
-        """Create the fleet of aliens."""
-        # Create an alien and keep adding aliens until there's no room left.
-        # Spacing between aliens is one alien width and one alien height.
-        # Make an alien.
+        """Create an army of poo."""
+        # Create an poo and keep adding poo until there's no room left.
+        # Spacing between poos is one poo width and one poo height.
+        # Make an poo.
         poo = Poo(self)
         poo_width, poo_height = poo.rect.size
 
@@ -123,6 +137,23 @@ class PooGame:
             current_x = poo_width
             current_y += 2 * poo_height
 
+    def _update_poos(self):
+        """Check if the army is at an edge, then update positions."""
+        self._check_army_edges()
+        self.poos.update()
+
+    def _check_army_edges(self):
+        """Respond appropriately if any aliens have reached an edge."""
+        for poo in self.poos.sprites():
+            if poo.check_edges():
+                self._change_army_direction()
+                break
+
+    def _change_army_direction(self):
+        """Drop the entire army and change the army's direction."""
+        for alien in self.poos.sprites():
+            alien.rect.y += self.settings.army_drop_speed
+        self.settings.army_direction *= -1
 
 
 if __name__ == '__main__':
