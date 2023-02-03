@@ -4,9 +4,11 @@ import sys
 import pygame
 
 from settings import Settings
+from time import sleep
 from toilet import Toilet
 from paper import Paper
 from poo import Poo
+from game_stats import GameStats
 
 
 class PooGame:
@@ -21,20 +23,27 @@ class PooGame:
         # Windows size (set in settings)
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))
-
         pygame.display.set_caption("Poo")
+
+        # Create an instance to store game statistics.
+        self.stats = GameStats(self)
+
         self.toilet = Toilet(self)
         self.bullets = pygame.sprite.Group()
         self.poos = pygame.sprite.Group()
         self._poo_army()
 
+        # Start Poo in an active state.
+        self.game_active = True
+
     def run_game(self):
         """Start main loop for the game"""
         while True:
             self._check_events()
-            self.toilet.update()
-            self._update_bullets()
-            self._update_poos()
+            if self.game_active:
+                self.toilet.update()
+                self._update_bullets()
+                self._update_poos()
             self._update_screen()
             self.clock.tick(60)
 
@@ -142,6 +151,13 @@ class PooGame:
         self._check_army_edges()
         self.poos.update()
 
+        # Look for poo-toilet collisions.
+        if pygame.sprite.spritecollideany(self.toilet, self.poos):
+            self._toilet_hit()
+
+        # Look for aliens hitting the bottom of the screen.
+        self._check_poos_bottom()
+
     def _check_army_edges(self):
         """Respond appropriately if any aliens have reached an edge."""
         for poo in self.poos.sprites():
@@ -154,6 +170,33 @@ class PooGame:
         for alien in self.poos.sprites():
             alien.rect.y += self.settings.army_drop_speed
         self.settings.army_direction *= -1
+
+    def _toilet_hit(self):
+        """Respond to the toilet being hit by an poo."""
+        if self.stats.toilets_left > 0:
+            # Decrement ships_left.
+            self.stats.toilets_left -= 1
+
+            # Get rid of any remaining bullets and  aliens.
+            self.bullets.empty()
+            self.poos.empty()
+
+            # Create a new fleet and center the ship.
+            self._poo_army()
+            self.toilet.center_toilet()
+
+            # Pause.
+            sleep(0.5)
+        else:
+            self.game_active = False
+
+    def _check_poos_bottom(self):
+        """Check if any poos have reached the bottom of the screen."""
+        for poo in self.poos.sprites():
+            if poo.rect.bottom >= self.settings.screen_height:
+                # Treat this the same as if the toilet got hit.
+                self._toilet_hit()
+                break
 
 
 if __name__ == '__main__':

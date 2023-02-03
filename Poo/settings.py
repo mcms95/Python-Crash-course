@@ -9,7 +9,8 @@ class Settings:
         self.bg_color = (230, 230, 230)
 
         # Ship(Toilet) settings
-        self.ship_speed = 5
+        self.toilet_speed = 5
+        self.toilet_limit = 3
 
         # Bullet settings
         self.bullet_speed = 2.0

@@ -3,7 +3,7 @@ from pygame.sprite import Sprite
 
 
 class Poo(Sprite):
-    """A class to represent a single alien in the fleet."""
+    """A class to represent a single poo in the army"""
 
     def __init__(self, poo_game):
         """Initialize the alien and set its starting position."""
