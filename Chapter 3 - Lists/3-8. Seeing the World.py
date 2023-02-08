@@ -1,4 +1,5 @@
 paises = ["Tailandia", "Argentina", "Japao", "Italia", "Mexico"]
+
 print(paises)
 print(sorted(paises))
 print(paises)

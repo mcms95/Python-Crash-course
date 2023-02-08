@@ -1,4 +1,5 @@
 jantar = ["didi", "ju", "cat", "sequeira"]
+
 print(f"Caro {jantar[0]} estás convidado para jantar nos meus aposentos!")
 print(f"Caro {jantar[1]} estás convidado para jantar nos meus aposentos!")
 print(f"Caro {jantar[-2]} estás convidado para jantar nos meus aposentos!")
